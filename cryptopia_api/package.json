@@ -1,0 +1,9 @@
+{
+  "name": "cryptoapi",
+  "version": "0.0.1",
+  "dependencies": {
+    "edge": "^7.10.1",
+    "node-getopt": "^0.2.3",
+    "request": "^2.83.0"
+  }
+}
