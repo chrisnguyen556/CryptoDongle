@@ -1,0 +1,20 @@
+{
+  "name": "CryptoDongle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "cryptopia_private_api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisnguyen556/CryptoDongle.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chrisnguyen556/CryptoDongle/issues"
+  },
+  "homepage": "https://github.com/chrisnguyen556/CryptoDongle#readme"
+}
