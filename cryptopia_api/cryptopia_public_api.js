@@ -7,128 +7,89 @@ var options = {
     method: "GET",
     headers: {
         "Content-type": "application/json; charset=utf-8"
-    }
+    },
+    json: true
 };
 
-function ExecuteRequest(name, options)
+function ExecuteRequest(call, options)
 {
     request(options, function (err, res, body)
     {
         if (body != null)
         {
-            var json = JSON.parse(body);
-            console.log(json);
+            var json = JSON.stringify(body);
+            //console.log(json);
         }
         else
         {
-            console.log(util.format("%s got fucked", name));
+            console.log(util.format("%s got fucked", call));
         }
     });
 }
 
 module.exports = {
     /*
-    Returns all currency data
-    GET https://www.cryptopia.co.nz/api/GetCurrencies
+    TODO: Usage formatting needs to be done
      */
-    GetCurrencies: function ()
+    SendRequest: function (call, params)
     {
-        options.url += "GetCurrencies";
-        ExecuteRequest("GetCurrencies", options);
-    },
+        var params_url = "";
+        if (Object.keys(params).length > 0)
+        {
+            Object.keys(params).forEach(function(key)
+            {
+                params_url += util.format("/%s", params[key]);
+            });
 
-    /*
-    Returns all trade pair data
-    GET https://www.cryptopia.co.nz/api/GetTradePairs
-     */
-    GetTradePairs: function ()
-    {
-        options.url += "GetTradePairs";
-        ExecuteRequest("GetTradePairs", options);
-    },
+            options.url += util.format("%s%s", call, params_url);
+        }
+        else
+        {
+            options.url += call;
+        }
 
-    /*
-    Returns all market data
-    GET https://www.cryptopia.co.nz/api/GetMarkets
-
-    Param: baseMarket (optional, default: All)
-    Param: hours (optional, default: 24)
-    TODO : "GET https://www.cryptopia.co.nz/api/GetMarkets/BTC"
-    TODO :"GET https://www.cryptopia.co.nz/api/GetMarkets/12"
-    TODO :"GET https://www.cryptopia.co.nz/api/GetMarkets/BTC/12"
-     */
-    GetMarkets: function ()
-    {
-        options.url += "GetMarkets";
-        ExecuteRequest("GetMarkets", options);
-    },
-
-    /*
-    Returns market data for the specified trade pair
-
-    Param: market (Required)(TradePairId or MarketName)
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarket/100
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarket/DOT_BTC
-
-    Param: hours(optional, default: 24)
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarket/100/6
-     */
-    GetMarket: function()
-    {
-        options.url += "GetMarket";
-        ExecuteRequest("GetMarket", options);
-    },
-
-    /*
-    GetMarketHistory
-    Returns the market history data for the specified trade pair
-
-    Param: market (Required) (TradePairId or MarketName)
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketHistory/100
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketHistory/DOT_BTC
-
-    Param: hours (optional, default: 24)
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketHistory/100/48
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketHistory/DOT_BTC/48
-     */
-    GetMarketHistory: function()
-    {
-        options.url += "GetMarketHistory";
-        ExecuteRequest("GetMarketHistory", options);
-    },
-
-    /*
-    GetMarketOrders
-    Returns the open buy and sell orders for the specified trade pair
-
-    Param: market (Required) (TradePairId or MarketName)
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketOrders/100
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketOrders/DOT_BTC
-
-    Param: orderCount (optional, default: 100)
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketOrders/100/50
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketOrders/DOT_BTC/50
-     */
-    GetMarketOrders: function()
-    {
-        options.url += "GetMarketOrders";
-        ExecuteRequest("GetMarketOrders", options);
-    },
-
-    /*
-    Returns the open buy and sell orders for the specified markets
-
-    Param: markets (Required) (TradePairIds or MarketNames seperated by '-')
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketOrderGroups/100-101-102-103
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketOrderGroups/DOT_BTC-DOT_LTC-DOT_DOGE-DOT_UNO
-
-    Param: orderCount (optional, default: 100)
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketOrderGroups/100-101-102-103/50
-    TODO: GET https://www.cryptopia.co.nz/api/GetMarketOrderGroups/DOT_BTC-DOT_LTC-DOT_DOGE-DOT_UNO/50
-     */
-    GetMarketOrderGroups: function()
-    {
-        options.url += "GetMarketOrderGroups";
-        ExecuteRequest("GetMarketOrderGroups", options);
+        console.log(util.format("Calling public call %s using %s", call, options.url));
+        ExecuteRequest(call, options);
     }
+
+    /*
+    All parameters: baseMarket (optional), market (required), markets (required), hours (optional), orderCount (optional)
+
+    Usage : baseMarket/hours, baseMarket, hours
+    Usage : market, market/hours
+    Usage : market, market/hours
+    Usage : market, market/orderCount
+    Usage : markets, markets/orderCount
+
+    GET https://www.cryptopia.co.nz/api/GetMarkets
+    Params: baseMarket (optional), hours (optional)
+    Usage : baseMarket/hours, baseMarket, hours
+    https://www.cryptopia.co.nz/api/GetMarkets/BTC
+    https://www.cryptopia.co.nz/api/GetMarkets/12
+    https://www.cryptopia.co.nz/api/GetMarkets/BTC/12
+
+    GET https://www.cryptopia.co.nz/api/GetMarkets
+    Params: market (required), hours (optional)
+    Usage : market, market/hours
+    https://www.cryptopia.co.nz/api/GetMarket/100/6
+
+    GET https://www.cryptopia.co.nz/api/GetMarketHistory
+    Params: market (required), hours (optional)
+    Usage : market, market/hours
+    https://www.cryptopia.co.nz/api/GetMarketHistory/100/48
+    https://www.cryptopia.co.nz/api/GetMarketHistory/DOT_BTC/48
+
+    GET https://www.cryptopia.co.nz/api/GetMarketOrders
+    Params: market (required), orderCount (optional)
+    Usage : market, market/orderCount
+    https://www.cryptopia.co.nz/api/GetMarketOrders/100/50
+    https://www.cryptopia.co.nz/api/GetMarketOrders/DOT_BTC/50
+
+    GET https://www.cryptopia.co.nz/api/GetMarketOrderGroups
+    Note: TradePairIds or MarketNames separated by '-'
+    Params: markets (required), orderCount (optional)
+    Usage : markets, markets/orderCount
+    https://www.cryptopia.co.nz/api/GetMarketOrderGroups/100-101-102-103/50
+    https://www.cryptopia.co.nz/api/GetMarketOrderGroups/DOT_BTC-DOT_LTC-DOT_DOGE-DOT_UNO/50
+     */
 };
